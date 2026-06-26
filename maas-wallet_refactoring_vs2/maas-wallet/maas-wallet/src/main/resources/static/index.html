@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MaaS Wallet - Carteira Multimodal de Mobilidade</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="glass-bg"></div>
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
+
+    <header class="navbar">
+        <div class="logo">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M19 5H5C3.89543 5 3 5.89543 3 7V17C3 18.1046 3.89543 19 5 19H19C20.1046 19 21 18.1046 21 17V7C21 5.89543 20.1046 5 19 5Z" stroke="url(#logoGrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M12 11C13.1046 11 14 10.1046 14 9C14 7.89543 13.1046 7 12 7C10.8954 7 10 7.89543 10 9C10 10.1046 10.8954 11 12 11Z" fill="url(#logoGrad)"/>
+                <path d="M21 12H16C15.4696 12 14.9609 12.2107 14.5858 12.5858C14.2107 12.9609 14 13.4696 14 14C14 14.5304 14.2107 15.0391 14.5858 15.4142C14.9609 15.7893 15.4696 16 16 16H21" stroke="url(#logoGrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <defs>
+                    <linearGradient id="logoGrad" x1="3" y1="5" x2="21" y2="19" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#3b82f6"/>
+                        <stop offset="1" stop-color="#8b5cf6"/>
+                    </linearGradient>
+                </defs>
+            </svg>
+            <span>MaaS <span class="highlight">Wallet</span></span>
+        </div>
+        <div class="user-status" id="navUserStatus">
+            <span class="status-indicator offline" id="connectionBadge">Conectando...</span>
+            <button class="btn btn-secondary btn-sm" id="btnLogoff" style="display: none;">Sair</button>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <!-- 1. TELA DE AUTENTICAÇÃO (LOGIN / REGISTRO) -->
+        <section class="auth-section" id="authSection">
+            <div class="auth-card">
+                <div class="auth-tabs">
+                    <button class="auth-tab active" onclick="switchAuthTab('login')">Entrar</button>
+                    <button class="auth-tab" onclick="switchAuthTab('register')">Criar Conta</button>
+                </div>
+
+                <!-- Formulário de Login -->
+                <form id="formLogin" class="auth-form">
+                    <h2>Bem-vindo de volta</h2>
+                    <p>Entre para planejar suas rotas e acessar seus créditos.</p>
+                    <div class="input-group">
+                        <label for="loginEmail">E-mail</label>
+                        <input type="email" id="loginEmail" placeholder="seu@email.com" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="loginPassword">Senha</label>
+                        <input type="password" id="loginPassword" placeholder="••••••••" required>
+                    </div>
+                    <div class="error-msg" id="loginError"></div>
+                    <button type="submit" class="btn btn-primary btn-block">Acessar Carteira</button>
+                </form>
+
+                <!-- Formulário de Registro -->
+                <form id="formRegister" class="auth-form" style="display: none;">
+                    <h2>Crie sua carteira única</h2>
+                    <p>Planeje, viaje e receba cashback em múltiplos modais.</p>
+                    <div class="input-group">
+                        <label for="regName">Nome Completo</label>
+                        <input type="text" id="regName" placeholder="João Silva" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="regDocument">Documento (CPF/CNPJ)</label>
+                        <input type="text" id="regDocument" placeholder="12345678900" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="regEmail">E-mail</label>
+                        <input type="email" id="regEmail" placeholder="seu@email.com" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="regPassword">Senha</label>
+                        <input type="password" id="regPassword" placeholder="Mínimo 6 caracteres" required minlength="6">
+                    </div>
+                    <div class="input-group">
+                        <label for="regType">Tipo de Usuário</label>
+                        <select id="regType">
+                            <option value="PASSENGER">Passageiro</option>
+                            <option value="ADMIN">Administrador MaaS</option>
+                            <option value="CORPORATE">Gestor Corporativo</option>
+                        </select>
+                    </div>
+                    <div class="error-msg" id="regError"></div>
+                    <button type="submit" class="btn btn-primary btn-block">Registrar e Entrar</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- 2. DASHBOARD DO USUÁRIO (APÓS LOGIN) -->
+        <section class="dashboard-section" id="dashboardSection" style="display: none;">
+            <div class="grid-container">
+                <!-- Coluna Esquerda: Saldo e Recarga -->
+                <div class="col-left">
+                    <!-- Painel de Perfil -->
+                    <div class="glass-card profile-card">
+                        <div class="avatar" id="userAvatar">U</div>
+                        <div class="profile-info">
+                            <h3 id="profileName">Carregando...</h3>
+                            <p id="profileEmail">email@maas.com</p>
+                            <span class="role-badge" id="profileRole">Passageiro</span>
+                        </div>
+                    </div>
+
+                    <!-- Painel de Saldos (Carteira) -->
+                    <div class="glass-card balance-card">
+                        <div class="balance-header">
+                            <span>Saldo Total Disponível</span>
+                            <span class="status-dot active">Carteira Ativa</span>
+                        </div>
+                        <div class="main-balance" id="valTotalBalance">R$ 0,00</div>
+                        <div class="balance-details">
+                            <div class="detail-item">
+                                <span class="label">Créditos de Transporte</span>
+                                <span class="value" id="valBalance">R$ 0,00</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="label">Saldo Cashback</span>
+                                <span class="value cashback" id="valCashback">R$ 0,00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Painel de Recarga Pix -->
+                    <div class="glass-card recharge-card">
+                        <h3>Recarga Instantânea Pix</h3>
+                        <form id="formRecharge">
+                            <div class="input-group">
+                                <label for="rechargeAmount">Valor (R$)</label>
+                                <input type="number" id="rechargeAmount" min="1.00" max="10000.00" step="0.01" placeholder="50.00" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-block">Gerar Pix & Depositar</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Coluna Direita: Rotas, Viagens e Ações -->
+                <div class="col-right">
+                    <!-- Painel de Planejamento de Rotas -->
+                    <div class="glass-card routes-card" id="routesCard">
+                        <h3>Planejar Deslocamento Multimodal</h3>
+                        <form id="formSearchRoutes" class="route-form">
+                            <div class="route-inputs">
+                                <div class="input-group">
+                                    <label>Origem</label>
+                                    <input type="text" id="routeOrigin" placeholder="Ex: Av. Paulista, 1000" required>
+                                </div>
+                                <div class="input-group">
+                                    <label>Destino</label>
+                                    <input type="text" id="routeDestination" placeholder="Ex: Pq. Ibirapuera" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary" id="btnSearchRoutes">Buscar Opções</button>
+                        </form>
+
+                        <!-- Resultados da Busca -->
+                        <div class="search-results" id="searchResults" style="display: none;">
+                            <h4>Opções Multimodais Encontradas</h4>
+                            <div class="options-list" id="optionsList">
+                                <!-- Preenchido dinamicamente via JS -->
+                            </div>
+                        </div>
+
+                        <!-- Cotação Ativa -->
+                        <div class="active-quote-container" id="activeQuoteContainer" style="display: none;">
+                            <div class="quote-header">
+                                <h4>Cotação Gerada com Sucesso</h4>
+                                <span class="timer" id="quoteTimer">05:00</span>
+                            </div>
+                            <div class="quote-card-detail" id="quoteDetails">
+                                <!-- Detalhes da Cotação -->
+                            </div>
+                            <div class="quote-actions">
+                                <button class="btn btn-secondary" id="btnCancelQuote">Cancelar</button>
+                                <button class="btn btn-primary" id="btnBookTrip">Confirmar e Pagar</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Viagem Reservada (Ativa) -->
+                    <div class="glass-card active-trip-card" id="activeTripCard" style="display: none;">
+                        <div class="trip-header">
+                            <h3>Viagem Reservada & Ativa</h3>
+                            <span class="status-badge" id="activeTripStatus">Reservado</span>
+                        </div>
+                        <div class="trip-body">
+                            <div class="map-simulation" id="mapSimulation">
+                                <div class="map-text">Simulação de Rota em Tempo Real</div>
+                                <div class="marker origin-marker"></div>
+                                <div class="marker dest-marker"></div>
+                                <div class="avatar-vehicle" id="avatarVehicle">🚗</div>
+                            </div>
+                            <div class="trip-info-summary" id="activeTripSummary">
+                                <!-- Detalhes da viagem ativa -->
+                            </div>
+                        </div>
+                        <div class="trip-actions">
+                            <button class="btn btn-danger" id="btnCancelTrip">Cancelar Viagem & Reaver Saldo</button>
+                            <button class="btn btn-success" id="btnSimulateComplete">Simular Conclusão (Webhook)</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Seção Inferior: Histórico (Extrato) e Admin -->
+            <div class="grid-container-bottom">
+                <!-- Extrato Ledger -->
+                <div class="glass-card ledger-card">
+                    <h3>Extrato Consolidado (Ledger Imutável)</h3>
+                    <div class="ledger-table-container">
+                        <table class="ledger-table">
+                            <thead>
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Operação</th>
+                                    <th>Descrição</th>
+                                    <th>Referência</th>
+                                    <th class="text-right">Valor</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ledgerEntriesTable">
+                                <tr>
+                                    <td colspan="5" class="text-center">Nenhuma transação registrada.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Painel Admin / Campanhas e Parceiros -->
+                <div class="glass-card admin-card" id="adminCard" style="display: none;">
+                    <h3>Painel Administrativo</h3>
+                    <div class="admin-tabs">
+                        <button class="admin-tab active" onclick="switchAdminTab('campaigns')">Campanhas Cashback</button>
+                        <button class="admin-tab" onclick="switchAdminTab('partners')">Cadastrar Parceiro</button>
+                    </div>
+
+                    <!-- Listagem e Criação de Campanhas -->
+                    <div id="adminCampaignsTab" class="admin-tab-content">
+                        <div class="admin-split">
+                            <div class="admin-list-section">
+                                <h4>Campanhas Vigentes</h4>
+                                <div class="campaign-list" id="adminCampaignsList">
+                                    <!-- Preenchido via JS -->
+                                </div>
+                            </div>
+                            <div class="admin-form-section">
+                                <h4>Criar Nova Campanha</h4>
+                                <form id="formCreateCampaign">
+                                    <div class="input-group">
+                                        <label>Nome da Campanha</label>
+                                        <input type="text" id="campName" placeholder="Cashback de Fim de Ano" required>
+                                    </div>
+                                    <div class="input-group-row">
+                                        <div class="input-group">
+                                            <label>Percentual (%)</label>
+                                            <input type="number" id="campPercent" min="0.01" max="100.00" step="0.01" placeholder="10.00" required>
+                                        </div>
+                                        <div class="input-group">
+                                            <label>Modal Elegível</label>
+                                            <select id="campModal">
+                                                <option value="BUS">Ônibus (BUS)</option>
+                                                <option value="RIDE_HAILING">Corrida (RIDE_HAILING)</option>
+                                                <option value="TAXI">Táxi (TAXI)</option>
+                                                <option value="BIKE">Bicicleta (BIKE)</option>
+                                                <option value="SCOOTER">Patinete (SCOOTER)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="input-group-row">
+                                        <div class="input-group">
+                                            <label>Teto Usuário (R$)</label>
+                                            <input type="number" id="campUserLimit" placeholder="20.00" required>
+                                        </div>
+                                        <div class="input-group">
+                                            <label>Teto Campanha (R$)</label>
+                                            <input type="number" id="campTotalLimit" placeholder="1000.00" required>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-secondary btn-block">Salvar Campanha</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cadastro de Parceiros -->
+                    <div id="adminPartnersTab" class="admin-tab-content" style="display: none;">
+                        <div class="admin-split">
+                            <div class="admin-list-section">
+                                <h4>Parceiros Homologados</h4>
+                                <div class="partner-list" id="adminPartnersList">
+                                    <!-- Preenchido via JS -->
+                                </div>
+                            </div>
+                            <div class="admin-form-section">
+                                <h4>Cadastrar Novo Parceiro</h4>
+                                <form id="formCreatePartner">
+                                    <div class="input-group">
+                                        <label>Nome do Parceiro</label>
+                                        <input type="text" id="partnerName" placeholder="Ex: Yellow Bikes" required>
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Chave de API (Secret Key)</label>
+                                        <input type="text" id="partnerApiKey" placeholder="Ex: api-key-12345" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-secondary btn-block">Salvar Parceiro</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2026 MaaS Wallet Platform. Desenvolvido em conformidade com a LGPD e regulamentações do Ledger Financeiro.</p>
+    </footer>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

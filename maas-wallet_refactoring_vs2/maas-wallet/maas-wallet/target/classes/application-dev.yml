@@ -1,0 +1,38 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:maasdb;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: sa
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        web-allow-others: true
+
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: none # Desabilitado, Flyway gerencia
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    schemas: PUBLIC
+
+  data:
+    redis:
+      repositories:
+        enabled: false # Desabilita repositórios Redis para evitar conexão obrigatória em dev
+
+logging:
+  level:
+    root: INFO
+    br.com.maaswallet: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
